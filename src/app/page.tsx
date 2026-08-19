@@ -30,7 +30,7 @@ const hitChanceWithin=(average:number,spins:number)=>average>1?(1-Math.pow(1-1/a
 export default function Home(){
   const [tab,setTab]=useState<Tab>("home");
   const [games,setGames]=useState(0),[big,setBig]=useState(0),[reg,setReg]=useState(0),[currentSpins,setCurrentSpins]=useState(0);
-  const [plays,setPlays]=useState<Play[]>(()=>{if(typeof window==="undefined")return initial;const s=localStorage.getItem("jagu-numa-plays");return s?JSON.parse(s):initial;}),[modal,setModal]=useState(false),[toast,setToast]=useState("");
+  const [plays,setPlays]=useState<Play[]>(()=>{if(typeof window==="undefined")return initial;const s=localStorage.getItem("jagu-numa-plays");return s?(JSON.parse(s) as Play[]).filter(p=>p.id>3):initial;}),[modal,setModal]=useState(false),[toast,setToast]=useState("");
   useEffect(()=>{if(!toast)return;const id=setTimeout(()=>setToast(""),2200);return()=>clearTimeout(id);},[toast]);
   const combined=rate(games,big+reg),rr=rate(games,reg);
   const forecast=useMemo(()=>({chancePerSpin:combined>1?100/combined:0,chance100:hitChanceWithin(combined,100),chance200:hitChanceWithin(combined,200),chance300:hitChanceWithin(combined,300)}),[combined]);
