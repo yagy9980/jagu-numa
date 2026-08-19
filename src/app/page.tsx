@@ -6,11 +6,7 @@ import IncomeCalendar from "./IncomeCalendar";
 type Tab = "home" | "judge" | "records" | "community" | "ranking";
 type Play = { id:number; machine:string; shop:string; games:number; big:number; reg:number; coins:number; yen?:number; memo:string; date:string };
 
-const initial: Play[] = [
-  {id:1,machine:"マイジャグラーV",shop:"中津駅前店",games:6324,big:29,reg:25,coins:1280,memo:"REG先行から後半にBIGが追いついた。",date:"8/17"},
-  {id:2,machine:"アイムジャグラーEX",shop:"大分中央店",games:4812,big:18,reg:20,coins:420,memo:"ブドウ良好。閉店まで粘り。",date:"8/16"},
-  {id:3,machine:"ファンキージャグラー2",shop:"別府店",games:3540,big:12,reg:9,coins:-760,memo:"合算失速。深追いせず終了。",date:"8/15"},
-];
+const initial: Play[] = [];
 const ranks = [
   ["マイジャグラーV",91,"1/240","1/272","12,842"],
   ["アイムジャグラーEX",88,"1/251","1/279","11,076"],
@@ -30,7 +26,7 @@ const hitChanceWithin=(average:number,spins:number)=>average>1?(1-Math.pow(1-1/a
 export default function Home(){
   const [tab,setTab]=useState<Tab>("home");
   const [games,setGames]=useState(0),[big,setBig]=useState(0),[reg,setReg]=useState(0),[currentSpins,setCurrentSpins]=useState(0);
-  const [plays,setPlays]=useState<Play[]>(()=>{if(typeof window==="undefined")return initial;const s=localStorage.getItem("jagu-numa-plays");return s?(JSON.parse(s) as Play[]).filter(p=>p.id>3):initial;}),[modal,setModal]=useState(false),[toast,setToast]=useState("");
+  const [plays,setPlays]=useState<Play[]>(()=>{if(typeof window==="undefined")return initial;const s=localStorage.getItem("jagu-numa-plays");if(!s)return initial;const cleaned=(JSON.parse(s) as Play[]).filter(p=>p.id>3&&!(["マイジャグラーV","アイムジャグラーEX","ファンキージャグラー2"].includes(p.machine)&&["8/15","8/16","8/17"].includes(p.date)));localStorage.setItem("jagu-numa-plays",JSON.stringify(cleaned));return cleaned;}),[modal,setModal]=useState(false),[toast,setToast]=useState("");
   useEffect(()=>{if(!toast)return;const id=setTimeout(()=>setToast(""),2200);return()=>clearTimeout(id);},[toast]);
   const combined=rate(games,big+reg),rr=rate(games,reg);
   const forecast=useMemo(()=>({chancePerSpin:combined>1?100/combined:0,chance100:hitChanceWithin(combined,100),chance200:hitChanceWithin(combined,200),chance300:hitChanceWithin(combined,300)}),[combined]);
