@@ -10,3 +10,21 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .incomeCalendar{margin:0 0 18px;padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:20px;background:linear-gradient(145deg,rgba(32,25,43,.98),rgba(12,9,17,.98));box-shadow:0 12px 30px rgba(0,0,0,.28)}
 .incomeCalendar>header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.incomeCalendar>header button{width:38px;height:38px;border:1px solid rgba(255,255,255,.14);border-radius:50%;background:rgba(255,255,255,.06);color:#fff;font-size:26px}.incomeCalendar>header div{text-align:center}.incomeCalendar>header small{color:#c7a55b;font-size:10px;letter-spacing:1.8px}.incomeCalendar>header h2{margin:3px 0 0;font-size:19px}.calendarSummary{display:grid;grid-template-columns:1.5fr 1fr;gap:10px;margin-bottom:14px}.calendarSummary>div{display:flex;flex-direction:column;padding:12px;border-radius:14px;background:rgba(255,255,255,.055)}.calendarSummary small{color:#9e99a7;font-size:11px}.calendarSummary b{margin-top:4px;font-size:19px}.calendarSummary span{margin-top:2px;font-size:12px}.week,.calendarGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.week span{text-align:center;color:#77717f;font-size:10px;padding:4px 0}.week span:first-child{color:#e07878}.week span:last-child{color:#799ee8}.calendarGrid>div{min-height:58px;padding:5px 3px;border-radius:8px;background:rgba(255,255,255,.035);overflow:hidden}.calendarGrid .blank{background:transparent}.calendarGrid small{display:block;color:#aaa4b1;font-size:10px}.calendarGrid b,.calendarGrid em{display:block;margin-top:5px;font-size:9px;font-style:normal;line-height:1.15;white-space:nowrap}.calendarGrid .win{background:rgba(34,197,94,.12)}.calendarGrid .win b,.calendarGrid .win em{color:#57d889}.calendarGrid .lose{background:rgba(239,68,68,.12)}.calendarGrid .lose b,.calendarGrid .lose em{color:#ff7d86}.incomeCalendar>p{margin:12px 0 0;color:#817b89;font-size:10px;text-align:center}.recordList article>strong small{display:block;margin-top:4px;font-size:10px}
 @media(max-width:390px){.incomeCalendar{padding:12px}.calendarGrid>div{min-height:52px}.calendarGrid b,.calendarGrid em{font-size:8px}}
+
+
+/* 沼スキャン */
+.scanCta{box-shadow:0 14px 34px rgba(95,95,255,.28)}
+.recordActions{display:grid;gap:10px;margin:18px 0}
+.scanModal{max-height:88vh;overflow:auto}
+.scanLead{margin:0 0 16px;color:#aaa5b8;line-height:1.65}
+.scanPicker{display:block!important;margin:0 0 14px!important}
+.scanPicker input{position:absolute;opacity:0;pointer-events:none}
+.scanPicker span{display:flex;align-items:center;justify-content:center;min-height:58px;border:1px dashed #7857dc;border-radius:16px;background:rgba(91,57,194,.13);color:#e5ddff;font-weight:800;cursor:pointer}
+.scanPreview{display:block;width:100%;max-height:340px;object-fit:contain;border-radius:16px;border:1px solid #3d2e66;background:#05040a;margin:0 0 14px}
+.scanResult{display:grid;gap:9px;margin:14px 0;padding:16px;border:1px solid #48506d;border-radius:16px;background:rgba(44,51,83,.23)}
+.scanResult>small{color:#8e80ff;letter-spacing:.16em;font-weight:800}
+.scanResult>div{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07)}
+.scanResult span,.scanResult p{color:#aaa5b8}.scanResult b{text-align:right}.scanResult p{margin:2px 0 0;font-size:12px;line-height:1.55}
+.scanError{padding:12px;border-radius:12px;background:rgba(225,63,54,.12);color:#ff8e88;font-weight:700}
+.scanPrivacy{display:block;margin:12px 4px 0;color:#777285;line-height:1.5;text-align:center}
+.scanModal button:disabled{opacity:.45;cursor:not-allowed}
