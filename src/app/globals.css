@@ -17,7 +17,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .recordActions{display:grid;gap:10px;margin:18px 0}
 .scanModal{max-height:88vh;overflow:auto}
 .scanLead{margin:0 0 16px;color:#aaa5b8;line-height:1.65}
-.scanPicker{display:block!important;margin:0 0 14px!important}
+.scanPickerRow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}.scanPicker{display:block!important;margin:0!important}
 .scanPicker input{position:absolute;opacity:0;pointer-events:none}
 .scanPicker span{display:flex;align-items:center;justify-content:center;min-height:58px;border:1px dashed #7857dc;border-radius:16px;background:rgba(91,57,194,.13);color:#e5ddff;font-weight:800;cursor:pointer}
 .scanPreview{display:block;width:100%;max-height:340px;object-fit:contain;border-radius:16px;border:1px solid #3d2e66;background:#05040a;margin:0 0 14px}
@@ -28,3 +28,5 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .scanError{padding:12px;border-radius:12px;background:rgba(225,63,54,.12);color:#ff8e88;font-weight:700}
 .scanPrivacy{display:block;margin:12px 4px 0;color:#777285;line-height:1.5;text-align:center}
 .scanModal button:disabled{opacity:.45;cursor:not-allowed}
+
+@media(max-width:480px){.scanPickerRow{grid-template-columns:1fr}.scanPicker span{min-height:52px}}
