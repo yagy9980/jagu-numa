@@ -15,7 +15,13 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 /* 沼スキャン */
 .scanCta{box-shadow:0 14px 34px rgba(95,95,255,.28)}
 .recordActions{display:grid;gap:10px;margin:18px 0}
-.scanModal{max-height:88vh;overflow:auto}
+.scanModal{max-height:calc(100dvh - max(12px,env(safe-area-inset-top)));overflow:auto;padding-bottom:calc(28px + env(safe-area-inset-bottom));overscroll-behavior:contain}
+.scanModal>header{position:sticky;top:-20px;z-index:5;margin:-20px -17px 12px;padding:20px 17px 10px;background:#0e0813;border-bottom:1px solid rgba(255,255,255,.08)}
+.scanEditGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.scanEditGrid label,.scanMachine{margin:0!important;color:#aaa5b8!important}
+.scanEditGrid input,.scanMachine input{margin-top:5px!important;padding:10px!important;font-size:16px}
+.scanMachine{display:block!important}
+.scanRecalc{width:100%;min-height:44px;margin:2px 0 10px}
 .scanLead{margin:0 0 16px;color:#aaa5b8;line-height:1.65}
 .scanPickerRow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}.scanPicker{display:block!important;margin:0!important}
 .scanPicker input{position:absolute;opacity:0;pointer-events:none}
@@ -29,4 +35,4 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .scanPrivacy{display:block;margin:12px 4px 0;color:#777285;line-height:1.5;text-align:center}
 .scanModal button:disabled{opacity:.45;cursor:not-allowed}
 
-@media(max-width:480px){.scanPickerRow{grid-template-columns:1fr}.scanPicker span{min-height:52px}}
+@media(max-width:480px){.scanPickerRow{grid-template-columns:1fr}.scanPicker span{min-height:52px}.scanPreview{max-height:250px}.scanEditGrid{grid-template-columns:1fr 1fr}.scanModal{border-radius:18px 18px 0 0}}
