@@ -28,6 +28,12 @@ export default function Home(){
   const [tab,setTab]=useState<Tab>("home");
   const [games,setGames]=useState(0),[big,setBig]=useState(0),[reg,setReg]=useState(0),[currentSpins,setCurrentSpins]=useState(0);
   const [plays,setPlays]=useState<Play[]>(()=>{if(typeof window==="undefined")return initial;const s=localStorage.getItem("jagu-numa-plays");if(!s)return initial;const cleaned=(JSON.parse(s) as Play[]).filter(p=>p.id>3&&!(["マイジャグラーV","アイムジャグラーEX","ファンキージャグラー2"].includes(p.machine)&&["8/15","8/16","8/17"].includes(p.date)));localStorage.setItem("jagu-numa-plays",JSON.stringify(cleaned));return cleaned;}),[modal,setModal]=useState(false),[toast,setToast]=useState(""),[scanOpen,setScanOpen]=useState(false),[scanImage,setScanImage]=useState(""),[scanData,setScanData]=useState<ScanData|null>(null),[scanBusy,setScanBusy]=useState(false),[scanError,setScanError]=useState("");
+  useEffect(()=>{
+    const host=window.location.hostname;
+    if(host.startsWith("jagu-numa-")&&host.endsWith(".vercel.app")){
+      window.location.replace(`https://jagu-numa.vercel.app${window.location.pathname}${window.location.search}${window.location.hash}`);
+    }
+  },[]);
   useEffect(()=>{if(!toast)return;const id=setTimeout(()=>setToast(""),2200);return()=>clearTimeout(id);},[toast]);
   const combined=rate(games,big+reg),rr=rate(games,reg);
   const forecast=useMemo(()=>({chancePerSpin:combined>1?100/combined:0,chance100:hitChanceWithin(combined,100),chance200:hitChanceWithin(combined,200),chance300:hitChanceWithin(combined,300)}),[combined]);
