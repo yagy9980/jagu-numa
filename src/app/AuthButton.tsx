@@ -154,7 +154,7 @@ export default function AuthButton() {
               <div><small>NUMA ACCOUNT</small><h2>{session ? "会員メニュー" : mode === "signup" ? "新規会員登録" : mode === "reset" || mode === "recovery" ? "パスワード再設定" : "ログイン"}</h2></div>
               <button type="button" onClick={() => setOpen(false)}>×</button>
             </header>
-            {session ? (
+            {session && mode !== "recovery" ? (
               <div className="numa-auth-account">
                 <p><b>{label}</b><span>{session.user.email}</span></p>
                 <button type="button" onClick={logout}>ログアウト</button>
