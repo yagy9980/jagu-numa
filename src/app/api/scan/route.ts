@@ -30,9 +30,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "AI読取りの準備がまだ完了していません。VercelにAPIキーを設定してください。" }, { status: 503 });
     }
 
+    const contentLength = Number(request.headers.get("content-length") || 0);
+    if (contentLength > 4_000_000) {
+      return NextResponse.json({ error: "写真の容量が大きすぎます。画面部分だけを撮影してください。" }, { status: 413 });
+    }
+
     const body = await request.json();
     const image = typeof body.image === "string" ? body.image : "";
-    if (!image.startsWith("data:image/") || image.length > 8_000_000) {
+    if (!image.startsWith("data:image/") || image.length > 3_500_000) {
       return NextResponse.json({ error: "写真を確認できません。別の写真を選んでください。" }, { status: 400 });
     }
 
@@ -44,6 +49,8 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: "gpt-5-mini",
+        store: false,
+        max_output_tokens: 900,
         input: [{
           role: "user",
           content: [
