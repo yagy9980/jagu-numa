@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 
-type Mode = "login" | "signup" | "reset";
+type Mode = "login" | "signup" | "reset" | "recovery";
 type Session = {
   access_token: string;
   refresh_token?: string;
@@ -18,11 +18,11 @@ function config() {
   return url && key ? { url, key } : null;
 }
 
-async function authRequest(path: string, body?: unknown, token?: string) {
+async function authRequest(path: string, body?: unknown, token?: string, method: "POST" | "PUT" = "POST") {
   const current = config();
   if (!current) throw new Error("会員機能の接続設定がまだ完了していません。");
   const response = await fetch(`${current.url}/auth/v1/${path}`, {
-    method: "POST",
+    method,
     headers: {
       apikey: current.key,
       "Content-Type": "application/json",
@@ -52,6 +52,26 @@ export default function AuthButton() {
 
   useEffect(() => {
     try {
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      const accessToken = hash.get("access_token");
+      if (accessToken) {
+        const parsed: Session = {
+          access_token: accessToken,
+          refresh_token: hash.get("refresh_token") || undefined,
+          expires_at: Math.floor(Date.now() / 1000) + Number(hash.get("expires_in") || 3600),
+          user: { id: "", email: "" },
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        setSession(parsed);
+        if (hash.get("type") === "recovery") {
+          setMode("recovery");
+          setOpen(true);
+        } else {
+          setMessage("メール確認が完了しました。");
+        }
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+        return;
+      }
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return;
       const parsed = JSON.parse(saved) as Session;
@@ -75,16 +95,21 @@ export default function AuthButton() {
     setError("");
     setMessage("");
     try {
-      if (mode === "reset") {
-        await authRequest("recover", { email, redirect_to: window.location.origin });
+      if (mode === "recovery") {
+        if (password.length < 8) throw new Error("パスワードは8文字以上にしてください。");
+        if (!session?.access_token) throw new Error("再設定リンクの有効期限が切れています。");
+        await authRequest("user", { password }, session.access_token, "PUT");
+        setMessage("新しいパスワードを保存しました。");
+        setMode("login");
+      } else if (mode === "reset") {
+        await authRequest(`recover?redirect_to=${encodeURIComponent(window.location.origin)}`, { email });
         setMessage("パスワード再設定メールを送りました。メールをご確認ください。");
       } else if (mode === "signup") {
         if (password.length < 8) throw new Error("パスワードは8文字以上にしてください。");
-        const result = await authRequest("signup", {
+        const result = await authRequest(`signup?redirect_to=${encodeURIComponent(window.location.origin)}`, {
           email,
           password,
           data: { display_name: displayName || email.split("@")[0] },
-          options: { emailRedirectTo: window.location.origin },
         });
         if (result.access_token) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
@@ -126,7 +151,7 @@ export default function AuthButton() {
         <div className="numa-auth-backdrop" onMouseDown={() => setOpen(false)}>
           <section className="numa-auth-modal" onMouseDown={(event) => event.stopPropagation()}>
             <header>
-              <div><small>NUMA ACCOUNT</small><h2>{session ? "会員メニュー" : mode === "signup" ? "新規会員登録" : mode === "reset" ? "パスワード再設定" : "ログイン"}</h2></div>
+              <div><small>NUMA ACCOUNT</small><h2>{session ? "会員メニュー" : mode === "signup" ? "新規会員登録" : mode === "reset" || mode === "recovery" ? "パスワード再設定" : "ログイン"}</h2></div>
               <button type="button" onClick={() => setOpen(false)}>×</button>
             </header>
             {session ? (
@@ -142,11 +167,11 @@ export default function AuthButton() {
                 </div>
                 <form onSubmit={submit}>
                   {mode === "signup" && <label>表示名<input name="displayName" autoComplete="nickname" placeholder="例：沼太郎" /></label>}
-                  <label>メールアドレス<input required name="email" type="email" autoComplete="email" placeholder="name@example.com" /></label>
-                  {mode !== "reset" && <label>パスワード<input required name="password" type="password" minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} placeholder="8文字以上" /></label>}
+                  {mode !== "recovery" && <label>メールアドレス<input required name="email" type="email" autoComplete="email" placeholder="name@example.com" /></label>}
+                  {mode !== "reset" && <label>{mode === "recovery" ? "新しいパスワード" : "パスワード"}<input required name="password" type="password" minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} placeholder="8文字以上" /></label>}
                   {error && <p className="numa-auth-error">{error}</p>}
                   {message && <p className="numa-auth-success">{message}</p>}
-                  <button className="numa-auth-submit" disabled={busy}>{busy ? "処理中…" : mode === "signup" ? "無料で登録する" : mode === "reset" ? "再設定メールを送る" : "ログインする"}</button>
+                  <button className="numa-auth-submit" disabled={busy}>{busy ? "処理中…" : mode === "signup" ? "無料で登録する" : mode === "reset" ? "再設定メールを送る" : mode === "recovery" ? "新しいパスワードを保存" : "ログインする"}</button>
                 </form>
                 {mode === "login" && <button className="numa-auth-reset" type="button" onClick={() => { setMode("reset"); setError(""); setMessage(""); }}>パスワードを忘れた方</button>}
                 {mode === "reset" && <button className="numa-auth-reset" type="button" onClick={() => { setMode("login"); setError(""); setMessage(""); }}>ログインへ戻る</button>}
