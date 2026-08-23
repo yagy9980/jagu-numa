@@ -38,6 +38,6 @@ jobs:
         env:
           SUPABASE_URL: https://orxhhddrjbxjkyxjdegf.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          MAX_AGE_DAYS: "7"
-          MAX_REPORTS: "80"
+          MAX_AGE_DAYS: "60"
+          MAX_REPORTS: "200"
         run: python scripts/collect_oita_slodata.py
