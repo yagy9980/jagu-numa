@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./auth-mobile.css";
 import MemberShopLink from "./MemberShopLink";
 
 export const metadata: Metadata = {
