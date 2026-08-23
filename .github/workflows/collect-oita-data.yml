@@ -36,7 +36,7 @@ jobs:
 
       - name: Collect and store Oita machine data
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_URL: https://orxhhddrjbxjkyxjdegf.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           MAX_AGE_DAYS: "7"
           MAX_REPORTS: "80"
