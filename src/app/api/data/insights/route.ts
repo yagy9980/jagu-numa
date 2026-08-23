@@ -1,20 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 
-type Row={machine_name:string;category:string;total_spins:number|null;bb:number|null;rb:number|null;jackpot_count:number|null;net_coins:number|null;net_balls:number|null;play_date:string};
+type InsightRow={
+  category:string;
+  machine_name:string;
+  sample_size:number;
+  total_spins:number;
+  total_hits:number;
+  empirical_odds:number|null;
+  avg_net_coins:number|null;
+  latest_play_date:string|null;
+};
 
 export async function GET(req:NextRequest){
- const machine=(req.nextUrl.searchParams.get("machine")||"").trim();
- const category=(req.nextUrl.searchParams.get("category")||"slot").trim();
- if(!machine)return NextResponse.json({error:"machine is required"},{status:400});
- const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
- const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
- if(!url||!key)return NextResponse.json({sampleSize:0,available:false});
- const qs=new URLSearchParams({select:"machine_name,category,total_spins,bb,rb,jackpot_count,net_coins,net_balls,play_date",category:`eq.${category}`,machine_name:`ilike.*${machine}*`,order:"play_date.desc",limit:"1000"});
- const r=await fetch(`${url}/rest/v1/oita_machine_daily?${qs}`,{headers:{apikey:key,Authorization:`Bearer ${key}`},next:{revalidate:300}});
- if(!r.ok)return NextResponse.json({sampleSize:0,available:false});
- const rows=await r.json() as Row[];
- let spins=0,hits=0,net=0,netN=0;
- for(const x of rows){const s=Number(x.total_spins||0);const h=category==="slot"?Number(x.bb||0)+Number(x.rb||0):Number(x.jackpot_count||0);if(s>0&&h>0){spins+=s;hits+=h}const n=category==="slot"?x.net_coins:x.net_balls;if(typeof n==="number"){net+=n;netN++}}
- const empiricalOdds=hits>0?spins/hits:null;
- return NextResponse.json({available:rows.length>0,sampleSize:rows.length,totalSpins:spins,totalHits:hits,empiricalOdds:empiricalOdds?Number(empiricalOdds.toFixed(2)):null,averageNet:netN?Number((net/netN).toFixed(1)):null,latestDate:rows[0]?.play_date||null});
+  const machine=(req.nextUrl.searchParams.get("machine")||"").trim();
+  if(!machine)return NextResponse.json({error:"machine is required"},{status:400});
+  const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if(!url||!key)return NextResponse.json({available:false,sampleSize:0});
+  const qs=new URLSearchParams({
+    select:"category,machine_name,sample_size,total_spins,total_hits,empirical_odds,avg_net_coins,latest_play_date",
+    category:"eq.slot",
+    machine_name:`ilike.*${machine}*`,
+    order:"sample_size.desc",
+    limit:"1"
+  });
+  const r=await fetch(`${url}/rest/v1/oita_machine_insights?${qs}`,{
+    headers:{apikey:key,Authorization:`Bearer ${key}`},
+    next:{revalidate:300}
+  });
+  if(!r.ok)return NextResponse.json({available:false,sampleSize:0});
+  const rows=await r.json() as InsightRow[];
+  const x=rows[0];
+  if(!x)return NextResponse.json({available:false,sampleSize:0});
+  return NextResponse.json({
+    available:true,
+    sampleSize:Number(x.sample_size||0),
+    totalSpins:Number(x.total_spins||0),
+    totalHits:Number(x.total_hits||0),
+    empiricalOdds:x.empirical_odds==null?null:Number(x.empirical_odds),
+    averageNet:x.avg_net_coins==null?null:Number(x.avg_net_coins),
+    latestDate:x.latest_play_date
+  });
 }
