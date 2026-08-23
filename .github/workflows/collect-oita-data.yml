@@ -19,7 +19,7 @@ permissions:
 jobs:
   collect-slodata-lab:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,6 +38,7 @@ jobs:
         env:
           SUPABASE_URL: https://orxhhddrjbxjkyxjdegf.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          MAX_AGE_DAYS: "60"
-          MAX_REPORTS: "200"
+          # 公開されている過去データを最大約5年遡って収集
+          MAX_AGE_DAYS: "1825"
+          MAX_REPORTS: "3000"
         run: python scripts/collect_oita_slodata.py
