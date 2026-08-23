@@ -2,6 +2,13 @@ name: Collect Oita public hall data
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/collect-oita-data.yml"
+      - "scripts/collect_oita_slodata.py"
+      - "scripts/requirements.txt"
   schedule:
     # 23:10 JST every day
     - cron: "10 14 * * *"
