@@ -10,16 +10,19 @@ on:
       - "scripts/collect_oita_slodata.py"
       - "scripts/requirements.txt"
   schedule:
-    # 23:10 JST every day
-    - cron: "10 14 * * *"
+    # 最新データを3時間ごとに回収
+    - cron: "10 */3 * * *"
+    # 過去データの長期バックフィルは毎日23:40 JST
+    - cron: "40 14 * * *"
 
 permissions:
   contents: read
 
 jobs:
-  collect-slodata-lab:
+  collect-recent:
+    if: github.event_name != 'schedule' || github.event.schedule != '40 14 * * *'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,11 +37,36 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Collect and store Oita machine data
+      - name: Collect recent Oita machine data
         env:
           SUPABASE_URL: https://orxhhddrjbxjkyxjdegf.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          # 公開されている過去データを最大約5年遡って収集
+          MAX_AGE_DAYS: "45"
+          MAX_REPORTS: "500"
+        run: python scripts/collect_oita_slodata.py
+
+  collect-backfill:
+    if: github.event_name == 'schedule' && github.event.schedule == '40 14 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Backfill older Oita machine data
+        env:
+          SUPABASE_URL: https://orxhhddrjbxjkyxjdegf.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           MAX_AGE_DAYS: "1825"
-          MAX_REPORTS: "3000"
+          MAX_REPORTS: "5000"
         run: python scripts/collect_oita_slodata.py
